@@ -1,0 +1,43 @@
+# logrotate
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.bidder.bidderName }}-{{ .Values.logrotate.name }}
+  labels:
+    app: {{ .Values.logrotate.label }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.logrotate.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.logrotate.label }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      containers:
+      - name: {{ .Values.logrotate.name }}
+        image: "{{ .Values.logrotate.imageRepository }}:{{ .Values.logrotate.imageTag }}"
+        imagePullPolicy: {{ .Values.logrotate.imagePullPolicy }}
+        env:
+        - name: CRON_EXPRESSION
+          value: "{{ .Values.logrotate.cronExpression }}"
+        - name: EXCHANGE
+          value: {{ .Values.bidder.bidderName }}
+        - name: BUCKET_REGION
+          value: {{ .Values.logrotate.bucketRegion }}
+        volumeMounts:
+        - name: host-mount
+          mountPath: "/media/ephemeral0/{{ .Values.logrotate.hostPath }}"
+        - name: host-mount-upload
+          mountPath: "/media/ephemeral0/upload/{{ .Values.logrotate.uploadPath }}"
+      terminationGracePeriodSeconds: {{ .Values.logrotate.terminationGracePeriod }}
+      volumes:
+      - name: host-mount
+        hostPath:
+          path: "/media/ephemeral0/{{ .Values.logrotate.hostPath }}"
+      - name: host-mount-upload
+        hostPath:
+          path: "/media/ephemeral0/upload{{ .Values.logrotate.uploadPath }}"

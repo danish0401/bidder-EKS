@@ -1,0 +1,31 @@
+namespace: spotx2
+serviceAccountName: "aws-access" 
+
+bidder:
+  label: bidder
+  bidderName: {{ssm "/Bidder/Tags/spotx2" }}
+  replicaCount: 5
+  imageRepository: 681420559112.dkr.ecr.us-east-1.amazonaws.com/bidder
+  imageTag: "latest"
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  bidderConfigurationSecretName: "/Bidder/Tags/SpotX2"
+  hostPath: {{ssm "/Bidder/Tags/spotx2" }}
+  volumeMountPath: {{ssm "/Bidder/Tags/spotx2" }}
+  volumeName: host-mount
+  serviceType: LoadBalancer
+  port: 80
+
+logrotate:
+  name: logrotate
+  label: bidder
+  imageRepository: 681420559112.dkr.ecr.us-east-1.amazonaws.com/logrotate
+  imageTag: latest
+  imagePullPolicy: IfNotPresent
+  terminationGracePeriod: 30
+  cronExpression: "*/5 * * * *"
+  bucketRegion: "us-east-1"
+  hostPath: {{ssm "/Bidder/Tags/spotx2" }}
+  uploadPath: {{ssm "/Bidder/Tags/spotx2" }}

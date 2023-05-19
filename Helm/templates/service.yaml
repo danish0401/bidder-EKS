@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.bidder.bidderName }}-service
+  labels:
+    app: {{ .Values.bidder.label }}
+spec:
+  type: {{ .Values.bidder.serviceType }}
+  selector:
+    app: {{ .Values.bidder.label }}
+  ports:
+  - port: {{ .Values.bidder.port }}

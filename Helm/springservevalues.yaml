@@ -1,0 +1,33 @@
+namespace: springserve
+serviceAccountName: "aws-access" 
+
+bidder:
+  label: bidder
+  bidderName: springserve
+  replicaCount: 2
+  imageRepository: 681420559112.dkr.ecr.us-east-1.amazonaws.com/bidder
+  imageTag: "latest"
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+  bidderConfigurationSecretName: "Bidder/Tags/SpringServe"
+  hostPath: "springserve"
+  volumeMountPath: "springserve"
+  volumeName: host-mount
+  serviceType: LoadBalancer
+  port: 80
+
+logrotate:
+  name: logrotate
+  label: bidder
+  imageRepository: 681420559112.dkr.ecr.us-east-1.amazonaws.com/logrotate
+  imageTag: latest
+  imagePullPolicy: IfNotPresent
+  terminationGracePeriod: 30
+  cronExpression: "*/5 * * * *"
+  bucketRegion: "us-east-1"
+  hostPath: springserve
+  uploadPath: springserve
+
+

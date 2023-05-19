@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.bidder.bidderName }}-bidder-deployment
+  labels:
+    app: {{ .Values.bidder.label }}
+spec:
+  replicas: {{ .Values.bidder.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.bidder.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.bidder.label }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      containers:
+        - name: {{ .Values.namespace }}
+          image: "{{ .Values.bidder.imageRepository }}:{{ .Values.bidder.imageTag }}"
+          imagePullPolicy: {{ .Values.bidder.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.bidder.port }}
+              protocol: TCP  
+          env:
+          - name: BIDDER_CONFIGURATION_SECRET_NAME
+            value: {{ .Values.bidder.bidderConfigurationSecretName }}
+          volumeMounts:
+          - mountPath: "/media/ephemeral0/{{ .Values.bidder.volumeMountPath }}"
+            name:  {{ .Values.bidder.volumeName }}
+      volumes:
+        - name: {{ .Values.bidder.volumeName }}
+          hostPath:
+            path: "/media/ephemeral0/{{ .Values.bidder.hostPath }}"
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http

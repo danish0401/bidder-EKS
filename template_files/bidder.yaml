@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bidder-deployment
+  labels:
+    app: bidder
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: bidder
+  template:
+    metadata:
+      labels:
+        app: bidder
+    spec:
+      # serviceAccountName: bidder
+      containers:
+      - name: bidder
+        image: 681420559112.dkr.ecr.us-east-1.amazonaws.com/bidder:latest
+        env:
+        - name: BIDDER_CONFIGURATION_SECRET_NAME
+          value: "Bidder/Tags/SpotX2"
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - mountPath: /media/ephemeral0/spotx2/
+          name: host-mount
+      volumes:
+        - name: host-mount
+          hostPath:
+            path: /media/ephemeral0/spotx2/
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bidder-service
+  labels:
+    app: bidder
+spec:
+  type: LoadBalancer
+  selector:
+    app: bidder
+  ports:
+  - port: 8000

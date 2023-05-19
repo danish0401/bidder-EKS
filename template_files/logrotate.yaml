@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: logrotate
+  labels:
+    app: bidder
+spec:
+  selector:
+    matchLabels:
+      app: bidder
+  template:
+    metadata:
+      labels:
+        app: bidder
+    spec:
+      serviceAccountName: bidder
+      tolerations:
+      # these tolerations are to have the daemonset runnable on control plane nodes
+      # remove them if your control plane nodes should not run pods
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: logrotate
+        image: 681420559112.dkr.ecr.us-east-1.amazonaws.com/logrotate:latest
+        env:
+        - name: CRON_EXPRESSION
+          value: "*/5 * * * *"
+        - name: EXCHANGE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: BUCKET_REGION
+          value: "us-east-1"
+        volumeMounts:
+        - name: host-mount
+          mountPath: /media/ephemeral0/spotx2/
+        - name: host-mount-upload
+          mountPath: /media/ephemeral0/upload/spotx2/
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: host-mount
+        hostPath:
+          path: /media/ephemeral0/spotx2/
+      - name: host-mount-upload
+        hostPath:
+          path: /media/ephemeral0/upload/spotx2/

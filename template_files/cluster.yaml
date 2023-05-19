@@ -1,0 +1,24 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: Bidder-Test
+  region: us-east-1
+
+vpc:
+  subnets:
+    public:
+      us-east-1a: {id: subnet-076e5900a1cb275df}
+      us-east-1b: {id: subnet-089cf05ada3a78259}
+
+nodeGroups:
+  - name: ng-1
+    labels: {role: workers}
+    instanceType: t3.medium
+    desiredCapacity: 1
+    privateNetworking: false
+  - name: ng-2
+    labels: {role: workers}
+    instanceType: t3.medium
+    desiredCapacity: 1
+    privateNetworking: false
