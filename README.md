@@ -28,3 +28,19 @@ This will deploy bidder application in `spotx2` namespace.
 
 * Check logs of bidder container: <br />
   `kubectl logs pod_name -n=spotx2 -c bidder`
+
+## Install Bidder helm charts on EKS
+
+* Install bidder helm chart in respective name space: <br />
+`helm install -f Helm/spotx2values.yaml spotx2 ./Helm/ -n spotx2 `
+<br />
+This will install bidder helmChart in `spotx2` namespace.
+
+* Check if pods are created in `spotx2` namespace: <br />
+`kubectl get pods -n=spotx2`
+
+* Exec into the container: <br />
+  `kubectl exec -n spotx2 --stdin --tty pod/pod_name -- /bin/bash`
+
+* Check logs of bidder container: <br />
+  `kubectl logs pod/pod_name -n spotx2`
